@@ -27,28 +27,45 @@ export async function GET(request: Request) {
     }
 
     const aresData = await aresResponse.json();
+    const addressString = aresData.sidlo?.textovaAdresa || 'Adresa nedostupná';
+
+    let lat = null;
+    let lng = null;
+
+    if (addressString !== 'Adresa nedostupná') {
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressString)}&format=json&limit=1`, {
+          headers: { 'User-Agent': 'FirmaCheck-App/1.0' }
+        });
+        const geoData = await geoRes.json();
+        if (geoData && geoData.length > 0) {
+          lat = parseFloat(geoData[0].lat);
+          lng = parseFloat(geoData[0].lon);
+        }
+      } catch (geoError) {
+        console.error('Chyba geocodingu:', geoError);
+      }
+    }
 
     const companyData = {
       ico: aresData.ico,
       name: aresData.obchodniJmeno,
       legal_form: aresData.pravniForma,
-      address: aresData.sidlo?.textovaAdresa || 'Adresa nedostupná',
+      address: addressString,
       established_date: aresData.datumVzniku || null,
       dic: aresData.dic || null,
+      lat: lat,
+      lng: lng,
       source: 'API',
     };
 
     await turso.execute({
-      sql: `INSERT INTO companies (ico, name, legal_form, address, established_date, dic, source) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      sql: `INSERT INTO companies (ico, name, legal_form, address, established_date, dic, lat, lng, source) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        companyData.ico,
-        companyData.name,
-        companyData.legal_form,
-        companyData.address,
-        companyData.established_date,
-        companyData.dic,
-        'API'
+        companyData.ico, companyData.name, companyData.legal_form,
+        companyData.address, companyData.established_date, companyData.dic,
+        companyData.lat, companyData.lng, 'API'
       ],
     });
 
