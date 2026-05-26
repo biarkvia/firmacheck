@@ -5,7 +5,8 @@ export async function GET() {
   try {
     const result = await turso.execute('SELECT * FROM companies WHERE is_saved = 1 ORDER BY last_updated DESC');
     return NextResponse.json(result.rows);
-  } catch {
+  } catch (error) {
+    console.error('[GET /api/saved] Chyba:', error);
     return NextResponse.json({ error: 'Chyba při načítání uložených firem' }, { status: 500 });
   }
 }
@@ -22,7 +23,8 @@ export async function POST(request: Request) {
       args: [ico],
     });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error('[POST /api/saved] Chyba:', error);
     return NextResponse.json({ error: 'Chyba při ukládání' }, { status: 500 });
   }
 }
@@ -40,7 +42,8 @@ export async function DELETE(request: Request) {
       args: [ico],
     });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error('[DELETE /api/saved] Chyba:', error);
     return NextResponse.json({ error: 'Chyba při mazání' }, { status: 500 });
   }
 }

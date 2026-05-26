@@ -39,6 +39,11 @@ const formatDateTime = (value?: string | null) => {
   }).format(new Date(value));
 };
 
+const loadSavedCompanies = async () => {
+  const res = await fetch('/api/saved');
+  return res.ok ? ((await res.json()) as Company[]) : [];
+};
+
 export default function Home() {
   const [ico, setIco] = useState('');
   const [searchName, setSearchName] = useState('');
@@ -50,11 +55,8 @@ export default function Home() {
 
   const fetchSavedCompanies = useCallback(async () => {
     try {
-      const res = await fetch('/api/saved');
-      if (res.ok) {
-        const data = (await res.json()) as Company[];
-        setSavedCompanies(data);
-      }
+      const data = await loadSavedCompanies();
+      setSavedCompanies(data);
     } catch (err) {
       console.error('Chyba při načítání uložených firem', err);
     }
@@ -63,9 +65,8 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch('/api/saved')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: Company[]) => {
+    loadSavedCompanies()
+      .then((data) => {
         if (!cancelled) {
           setSavedCompanies(data);
         }
@@ -230,7 +231,13 @@ export default function Home() {
         />
       </div>
 
-      <div className="flex flex-col gap-4 mb-8">
+      <form
+        className="flex flex-col gap-4 mb-8"
+        onSubmit={(event) => {
+          event.preventDefault();
+          verifyCompany(normalizedIco);
+        }}
+      >
         <div>
           <input
             type="text"
@@ -253,13 +260,13 @@ export default function Home() {
           className="border p-2 rounded text-black"
         />
         <button
-          onClick={() => verifyCompany(normalizedIco)}
+          type="submit"
           disabled={loading || !isIcoValid}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Načítám...' : 'Ověřit firmu'}
         </button>
-      </div>
+      </form>
 
       {error && <p className="text-red-500 bg-red-50 p-4 rounded mb-6">{error}</p>}
 
@@ -354,18 +361,20 @@ export default function Home() {
             {savedCompanies.map((company) => (
               <div key={company.ico} className="border p-4 rounded bg-white text-black shadow-sm hover:shadow transition">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-                  <button
-                    type="button"
-                    className="text-left"
-                    onClick={() => verifyCompany(company.ico)}
-                  >
-                    <h3 className="font-bold text-lg hover:text-blue-600">{company.name}</h3>
+                  <div className="text-left">
+                    <button
+                      type="button"
+                      className="font-bold text-lg text-left hover:text-blue-600"
+                      onClick={() => verifyCompany(company.ico)}
+                    >
+                      {company.name}
+                    </button>
                     <p className="text-sm text-gray-600">IČO: {company.ico}</p>
                     <p className="text-sm text-gray-600">Adresa: {company.address || 'Neuvedeno'}</p>
                     <p className="text-sm text-gray-600">
                       Poslední ověření: {formatDateTime(company.last_updated) || 'Neuvedeno'}
                     </p>
-                  </button>
+                  </div>
                   <button
                     onClick={() => removeCompany(company.ico)}
                     className="self-start text-red-500 hover:text-red-700 font-medium px-3 py-1 border border-red-200 rounded hover:bg-red-50"
