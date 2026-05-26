@@ -125,12 +125,19 @@ export default function Home() {
   };
 
   const isCurrentlySaved = result && savedCompanies.some(c => c.ico === result.ico);
-
-  return (
+return (
     <main className="min-h-screen p-8 max-w-2xl mx-auto font-sans">
       
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">FirmaCheck</h1>
+      <div className="mb-8 flex flex-col md:flex-row items-center gap-6 bg-blue-50 p-6 rounded-xl">
+        <div className="flex-1">
+          <h1 className="text-4xl font-bold text-blue-900 mb-2">FirmaCheck</h1>
+          <p className="text-blue-700">Rychlé ověření českých firem z ARES vč. zobrazení na mapě.</p>
+        </div>
+        <img 
+          src="/hero-image.png" 
+          alt="AI generated hero illustration" 
+          className="w-32 h-32 object-cover rounded-full shadow-md"
+        />
       </div>
       
       <div className="flex flex-col gap-4 mb-8">
