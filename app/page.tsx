@@ -214,7 +214,7 @@ export default function Home() {
   const isCurrentlySaved = result && savedCompanies.some((company) => company.ico === result.ico);
 
   return (
-    <main className="min-h-screen p-8 max-w-2xl mx-auto font-sans">
+    <main className="min-h-screen p-4 sm:p-8 max-w-2xl mx-auto font-sans">
       <div className="mb-8 flex flex-col md:flex-row items-center gap-6 bg-blue-50 p-6 rounded-xl">
         <div className="flex-1">
           <h1 className="text-4xl font-bold text-blue-900 mb-2">FirmaCheck</h1>
@@ -265,7 +265,7 @@ export default function Home() {
 
       {result && (
         <div className="border p-6 rounded-lg bg-gray-50 text-black shadow-sm mb-8 relative">
-          <div className="flex justify-between items-start gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
             <h2 className="text-2xl font-bold">{result.name}</h2>
             <span className="bg-yellow-200 px-2 py-1 rounded text-sm font-semibold whitespace-nowrap">
               ARES data: {result.source}
@@ -336,7 +336,7 @@ export default function Home() {
       )}
 
       <div className="border-t-2 border-gray-200 pt-8 mt-8">
-        <div className="flex justify-between items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h2 className="text-2xl font-bold">Uložené firmy ({savedCompanies.length})</h2>
           <button
             onClick={exportCSV}
@@ -353,7 +353,7 @@ export default function Home() {
           <div className="space-y-4">
             {savedCompanies.map((company) => (
               <div key={company.ico} className="border p-4 rounded bg-white text-black shadow-sm hover:shadow transition">
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <button
                     type="button"
                     className="text-left"
@@ -368,7 +368,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => removeCompany(company.ico)}
-                    className="text-red-500 hover:text-red-700 font-medium px-3 py-1 border border-red-200 rounded hover:bg-red-50"
+                    className="self-start text-red-500 hover:text-red-700 font-medium px-3 py-1 border border-red-200 rounded hover:bg-red-50"
                   >
                     Odstranit
                   </button>

@@ -22,6 +22,11 @@ For saving companies, I use the same table as the cache by simply toggling an `i
 ### Why OpenStreetMap for Geocoding?
 To speed up development and avoid the overhead of registering and managing API keys (which is required for Mapy.cz), I used the free Nominatim API (OpenStreetMap) to convert addresses into coordinates. The map itself is rendered via a simple iframe. However, for user convenience, I included a direct link to open the exact location on Mapy.cz.
 
+### Saved Companies and Export
+Verified companies can be saved by toggling the `is_saved` flag in the same Turso table used for the cache. This keeps cached ARES data, geocoding data, and the saved list in one simple SQLite-compatible storage layer.
+
+The export feature generates a real CSV file in the browser from the currently saved companies. It includes the required fields: IČO, business name, legal form, subject status, address, incorporation date, last verification date, data source, and coordinates when available. JSON export was treated as a bonus and was not implemented in this version.
+
 ---
 
 ## AI Tools Usage
