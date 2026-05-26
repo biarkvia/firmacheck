@@ -33,10 +33,12 @@ const csvEscape = (value: unknown) => {
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return '';
+  const dateValue = value.endsWith('Z') ? value : `${value}Z`;
+
   return new Intl.DateTimeFormat('cs-CZ', {
     dateStyle: 'medium',
     timeStyle: 'short',
-  }).format(new Date(value));
+  }).format(new Date(dateValue));
 };
 
 const loadSavedCompanies = async () => {
@@ -85,6 +87,10 @@ export default function Home() {
 
   const verifyCompany = async (icoToVerify = normalizedIco) => {
     const trimmedIco = icoToVerify.trim();
+
+    if (trimmedIco !== normalizedIco) {
+      setSearchName('');
+    }
 
     if (!/^\d{8}$/.test(trimmedIco)) {
       setError('IČO musí obsahovat přesně 8 číslic.');
@@ -203,13 +209,16 @@ export default function Home() {
       csvRows.push(row.map(csvEscape).join(','));
     });
 
-    const csvContent = `data:text/csv;charset=utf-8,\uFEFF${csvRows.join('\n')}`;
+    const csvContent = `\uFEFF${csvRows.join('\n')}`;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodeURI(csvContent));
+    link.href = url;
     link.setAttribute('download', 'ulozene_firmy.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const isCurrentlySaved = result && savedCompanies.some((company) => company.ico === result.ico);
